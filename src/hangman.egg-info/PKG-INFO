@@ -1,0 +1,17 @@
+Metadata-Version: 2.1
+Name: hangman
+Version: 0.0.1
+Summary: simple Hangman game
+Home-page: 
+Author: Nykyforets Volodymyr
+Author-email: nvova@i.ua
+License: UNKNOWN
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+
+UNKNOWN
+

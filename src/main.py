@@ -1,4 +1,6 @@
+from pickle import TRUE
 import random
+from re import A
 import time
 
 from rich.console import Console
@@ -43,7 +45,7 @@ def main():
                       style='bold underline blue on white')
 
         console.print(100 * '_', style='bold red')
-        console.print('\n   "game" for starting new game\n   "help" for rules.\n   "exit" to exit\n', style='bold blue')
+        console.print('\n   "game" for starting new game\n   "help" for rules.\n   "leader" for leaderboard\n   "exit" to exit\n', style='bold blue')
         user_input = input('>>>> ')
         console.print(100 * '_', style='bold red')
         user_input = user_input.lower()
@@ -58,8 +60,15 @@ def main():
             break
 
 
-def get_word():
-    with open("words.txt", "r") as f:
+def get_word(level):
+    
+    if level == '1':
+        file = 'easy.txt'
+    elif level == '2':
+        file = 'normal.txt'
+    else:
+        file = 'words.txt'
+    with open(file, "r") as f:
         lines = f.readlines()
         return random.choice(lines).rstrip()
 
@@ -94,6 +103,22 @@ def helps():
     if h_user == "3":
         rules()
         commands()
+
+def leaderboard(name,score):
+    with open("leaderboard.txt", "a") as f:
+        f.write(str(score) + ' ---- ' + str(name) + '\n')
+    with open("leaderboard.txt", "r+") as f:
+        lines = f.readlines()
+        lines.sort(reverse=True)
+    with open("leaderboard.txt", "w") as f:
+        for i in lines:
+            f.write(i)
+
+def leaderboard_show():
+    with open("leaderboard.txt", "r") as f:
+        lines = f.read()
+        print(lines)
+
 
 
 def loose(secret_word):
@@ -137,9 +162,12 @@ def rules():
     time.sleep(1)
     console.print("Good luck! And LET THE GAME START!!!!", style="bold underline green on red")
 
-
+@error_handler
 def game():
-    secret_word = get_word()
+    name = input('PLEASE ENTER YOU NAME. \n>>>> ')
+    score = 0
+    difficult = int(input('\nPLEASE ENTER difficult level.\nPress 1 for "easy"\nPress 2 for "normal"\nPress 3 for "difficult" \n>>>> '))
+    secret_word = get_word(difficult)
     console.print('I made up a word. Guess a word', style='bold underline cyan on white')
     lifes = 6
     letters = ''
@@ -149,31 +177,40 @@ def game():
         if '*' in secret_list:
             table(lifes, letters, secret_list)
             console.print('Guess a letter or word: ', style='bold underline cyan on white')
-            guess_word = input('>>>> ')
-            if guess_word == 'exit':
-                exits()
-                break
+            while True:
+                guess_word = input('>>>> ')
 
+                
+                if guess_word == 'exit':
+                    exits()
+                    break
+                elif len(guess_word)>1 or not guess_word.isalpha():
+                    print('Not one letter or not letter!')
+                else:
+                    break
+  
             if guess_word in secret_word:
                 console.print(f'Letter "{guess_word}" is in this word! Good choice.',
                               style='bold underline green on white')
+
                 letters += ' ' + guess_word
                 count = secret_word.count(guess_word)
+                score += count * 10
                 index = 0
-
                 for i in range(count):
-                    index = secret_word.find(guess_word, index)
+                    index = secret_word.find(guess_word, index,len(secret_word))
                     secret_list[index] = guess_word
-
+                    index +=1
             else:
                 console.print(f'Letter "{guess_word}" not in this word! You have lost 1 life',
                               style='bold underline red on white')
                 lifes -= 1
                 letters += ' ' + guess_word
         else:
+            score += 100
+            leaderboard(name, score)
             win(secret_word)
-            break
-        
+            return True
     if lifes == 0 and ('*' in secret_list):
         loose(secret_word)
 
@@ -238,7 +275,7 @@ def win(secret_word):
         print(lines)
 
 
-ANSWEARS = {'play': game, 'game': game, 'help': helps, 'rules': helps, 'clear': clear, 'exit': exits, 'commands': commands}
+ANSWEARS = {'play': game, 'game': game, 'help': helps, 'rules': helps, 'clear': clear, 'exit': exits, 'commands': commands, 'leaderboard':leaderboard_show, 'leader':leaderboard_show,}
 
 if __name__ == '__main__':
     greeting()

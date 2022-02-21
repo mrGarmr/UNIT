@@ -1,0 +1,6 @@
+pyproject.toml
+setup.cfg
+src/hangman.egg-info/PKG-INFO
+src/hangman.egg-info/SOURCES.txt
+src/hangman.egg-info/dependency_links.txt
+src/hangman.egg-info/top_level.txt
